@@ -1,5 +1,6 @@
 import express from "express";
 import mongoose from "mongoose";
+import { authMiddleware } from "./middlewares";
 
 class Server {
   public app = express();
@@ -28,7 +29,11 @@ class Server {
 
   private setupController(controllers) {
     controllers.forEach((controller: any) => {
-      this.app.use(controller.basePath, controller.router);
+      if (controller.requireAuth) {
+        this.app.use(controller.basePath, authMiddleware, controller.router);
+      } else {
+        this.app.use(controller.basePath, controller.router);
+      }
     });
   }
 

@@ -1,4 +1,4 @@
-import { UserController } from "./user";
+import { UserController } from "./UserController";
 import { NotFoundController } from "./notFound";
 import { AuthController } from "./AuthController";
 
