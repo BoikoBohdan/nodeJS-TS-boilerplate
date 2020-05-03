@@ -1,5 +1,6 @@
 import { Schema, model } from "mongoose";
-import { IUser } from "./user.iterface";
+import bcrypt from "bcrypt";
+import { IUser, IUserModel } from "./user.iterface";
 
 const UserSchema: Schema = new Schema({
   firstName: {
@@ -25,6 +26,17 @@ const UserSchema: Schema = new Schema({
   },
 });
 
-const UserModel = model<IUser>("User", UserSchema);
+UserSchema.pre<IUser>("save", function (next) {
+  if (this.isModified("password")) {
+    this.password = bcrypt.hashSync(this.password, 8);
+    next();
+  }
+});
+
+UserSchema.methods.comparePassword = function (pwd: string): boolean {
+  return bcrypt.compareSync(pwd, this.password);
+};
+
+const UserModel = model<IUser, IUserModel>("User", UserSchema);
 
 export { UserModel };
