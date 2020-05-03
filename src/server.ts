@@ -1,12 +1,23 @@
-import express, { Request, Response } from "express";
+import express from "express";
+import mongoose from "mongoose";
 
 class Server {
   public app = express();
 
   constructor({ controllers, middlewares }) {
+    this.connectionToServer();
     this.setupMiddlewares(middlewares);
     this.setupController(controllers);
-    // this.setupErrorHandler();
+  }
+
+  private connectionToServer() {
+    mongoose.connect(
+      `mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`,
+      { useNewUrlParser: true },
+      () => {
+        console.log("Successfully connected to db!");
+      }
+    );
   }
 
   private setupMiddlewares(middlewares) {
@@ -18,13 +29,6 @@ class Server {
   private setupController(controllers) {
     controllers.forEach((controller: any) => {
       this.app.use(controller.basePath, controller.router);
-    });
-  }
-
-  private setupErrorHandler() {
-    this.app.use((err: any, req: any, res: Response, next: any) => {
-      console.log(">>>");
-      //   res.status(404).send("Route not found!");
     });
   }
 
